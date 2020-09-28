@@ -1,0 +1,170 @@
+# -*- coding: utf-8 -*-
+
+"""
+
+@File    :   deal.py
+
+主控程序类
+
+"""
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+from untitled import Ui_MainWindow
+
+
+from child import Ui_Dialog
+
+from PyQt5.QtWidgets import QMessageBox
+
+import sys
+
+from Calculation import ger
+
+
+
+
+class Mywindow(QtWidgets.QMainWindow, Ui_MainWindow):
+
+    def __init__(self):
+
+        """
+
+        完成GUI初始化工作，绑定槽
+
+        """
+
+        super(Mywindow, self).__init__()
+
+        self.setupUi(self)  # 初始化GUI控件
+
+        self.horizontalSlider.valueChanged[int].connect(self.horizon_changeValue)
+
+        self.horizontalSlider_2.valueChanged[int].connect(self.horizon2_changeValue)
+
+        self.pushButton.clicked.connect(self.pushbutton_clich)
+
+        self.child_dia = Mydialog()
+
+    def pushbutton_clich(self):
+
+        try:
+
+            if self.check_inpue_valid():
+
+                count = int(self.lineEdit_2.text())
+
+                max_num = self.horizontalSlider.value()
+
+                dec = self.checkBox.isChecked()
+
+                bar = self.checkBox_2.isChecked()
+
+                out = self.radioButton.isChecked()
+
+                sym = self.get_sym()
+
+                num_cal_count = self.horizontalSlider_2.value()
+
+                mygerne = ger()  # 实例化一个ger对象
+
+                pri_str = mygerne.gen_que(count, max_num, dec, sym, bar, out, num_cal_count)  # 调用生成算式的函数
+
+                info.STR = pri_str
+
+                if out:  # 输出到文件
+
+                    self.fileout(pri_str)
+
+                    QMessageBox.information(self, "提示信息", "已生产文件，文件名为‘que.txt’", QMessageBox.Yes)
+
+                else:  # 屏幕显示
+
+                    self.child_dia.set_textbro()
+
+                    self.child_dia.exec_()
+
+        except Exception as e:
+
+            print(e)
+
+    def fileout(self, t_str):
+
+        with open("que.txt", "w", encoding="utf8") as f:
+            f.write(t_str)
+
+    #  检查输入是否合法
+
+    def check_inpue_valid(self):
+
+        if self.lineEdit_2.text() == '' or int(self.lineEdit_2.text()) == 0:
+            QMessageBox.warning(self, "警告信息", "题目数量数据不合法", QMessageBox.Yes)
+
+            return False
+
+        if self.horizontalSlider.value() == 0:
+            QMessageBox.warning(self, "警告信息", "最大数不合法", QMessageBox.Yes)
+
+            return False
+
+        if not self.get_sym():
+            QMessageBox.warning(self, "警告信息", "至少选择一个运算法则", QMessageBox.Yes)
+
+            return False
+
+        return True
+
+    # 获取选择的运算符
+
+    def get_sym(self):
+
+        sym_list = []
+
+        if self.checkBox_3.isChecked():
+            sym_list.append('+')
+
+        if self.checkBox_4.isChecked():
+            sym_list.append('÷')
+
+        if self.checkBox_5.isChecked():
+            sym_list.append('-')
+
+        if self.checkBox_6.isChecked():
+            sym_list.append('×')
+
+        return sym_list
+
+    def horizon_changeValue(self, value):
+
+        self.label_3.setText(str(value))
+
+    def horizon2_changeValue(self, value):
+
+        self.label_5.setText(str(value))
+
+
+#  子窗口
+
+class Mydialog(QtWidgets.QDialog, Ui_Dialog):
+
+    def __init__(self):
+        super(Mydialog, self).__init__()
+
+        self.setupUi(self)
+
+    def set_textbro(self):
+        self.textBrowser.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
+
+        # textBrowser要想正常显示水平滚动条，必须将lineWrapMode设置为nowrap
+
+        self.textBrowser.setText(info.STR)  # 设置文本浏览器
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+
+    myshow = Mywindow()
+
+    myshow.show()
+
+    sys.exit(app.exec_())
