@@ -4,15 +4,7 @@
 
 @File    :   Calculation.py
 
-@Time    :   2019/4/27 8:43
-
-@Contact :   lirookyoujian@gmail.com
-
-@Modify Time      @Author    @Version    @Desciption
-
-------------      -------    --------    -----------
-
-2019/4/27 8:43   zhenfeilee    1.0         None
+生成运算式的类
 
 """
 
